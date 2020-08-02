@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "shanebogetem",
   database: "employee_db",
 });
 
@@ -204,7 +204,4 @@ updateEmployeeRole = () => {
     })
     connection.query("UPDATE employee SET role_id = ? WHERE employee_id = ?", [roleID, empID])
 };
-// "What would you like to do"
-// add departments? Roles? Employees?
-// view dept, roles, employees
-// update employee roles
+
