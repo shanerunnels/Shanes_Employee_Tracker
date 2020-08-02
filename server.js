@@ -11,10 +11,10 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) throw err;
-  inTheBeginning();
+  startUp();
 });
 
-inTheBeginning = () => {
+startUp = () => {
   return inquirer
     .prompt({
       name: "action",
@@ -74,7 +74,7 @@ addDept = () => {
         if (err) throw err;
         console.log("1 new department added: " + answer.department);
         viewDept();
-        inTheBeginning();
+        startUp();
       }) 
     })
   };
@@ -107,7 +107,7 @@ addRole = () => {
             },
             function(err, res) {
                 if (err) throw err;
-                inTheBeginning();
+                startUp();
             }
         );
     });
@@ -162,7 +162,7 @@ viewDept = () => {
     connection.query("SELECT * from department", function(err, res) {
         if (err) throw err;
         console.table(res);
-        inTheBeginning();
+        startUp();
     })
 };
 
@@ -170,7 +170,7 @@ viewRole = () => {
     connection.query("SELECT * from role", function(err, res) {
         if (err) throw err;
         console.table(res);
-        inTheBeginning();
+        startUp();
     })
 };
 
@@ -180,7 +180,7 @@ viewEmployees = () => {
         function(err, res) {
             if (err) throw err;
             console.table(res);
-            inTheBeginning();
+            startUp();
         }
     )
 };
