@@ -61,23 +61,23 @@ inTheBeginning = () => {
     });
 };
 
+
 addDept = () => {
-    inquirer.prompt ({
+    inquirer.prompt([
+      {
+        name: "department",
         type: "input",
-        message: "New department name?",
-        name: "department"
+        message: "What department would you like to add?"
+      }
+    ]).then(function(answer) {
+      connection.query(`INSERT INTO department (name) VALUES ('${answer.department}')`, (err, res) => {
+        if (err) throw err;
+        console.log("1 new department added: " + answer.department);
+        viewDept();
+        inTheBeginning();
+      }) 
     })
-    .then(answer => {
-        console.log(answer.department);
-        connection.query("INSERT INTO department SET ?", {
-            name: answer.department,
-        },
-        function(err, res) {
-            if (err) throw err;
-            inTheBeginning();
-        });
-    });
-};
+  };
 
 addRole = () => {
     let questions = [
@@ -92,7 +92,7 @@ addRole = () => {
             name: "id"
         },
         {
-            type: "list",
+            type: "input",
             message: "What's the salary?",
             name: "salary"
         }
@@ -113,6 +113,10 @@ addRole = () => {
     });
 };
 
+function updateEmpManager (empID, roleID){
+    connection.query("UPDATE employee SET role_id = ? WHERE employee_id = ?", [roleID, empID])
+    };
+
 addEmployees = () => {
   let questions = [
     {
@@ -126,43 +130,33 @@ addEmployees = () => {
       name: "last_name",
     },
     {
-      type: "list",
-      message: "What role?",
-      name: "role_id",
-      validate: (value) => {
-        if (isNaN(value) === false) {
-          return true;
-        }
-        return false;
+        type: "input",
+        message: "What's the employee's title (role_id)?",
+        name: "titleID"
       },
-    },
-    {
-      type: "list",
-      message: "What manager?",
-      name: "manager_id",
-      validate: (value) => {
-        if (isNaN(value) === false) {
-          return true;
-        }
-        return false;
-      },
-    },
-  ];
-  inquirer.prompt(questions).then((answer) => {
-    connection.query(
-      "INSERT INTO employee SET ?",
       {
-        first_name: answer.first_name,
-        last_name: answer.last_name,
-        role_id: answer.titleID,
-        manager_id: answer.managerID,
-      },
-      function (err) {
-        if (err) throw err;
+        type: "input",
+        message: "Who's the employee's manager (employee_id)?",
+        name: "managerID"
       }
-    );
-  });
-};
+    ];
+    inquirer.prompt(questions).then(function(answer) {
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: answer.titleID,
+          manager_id: answer.managerID,
+        },
+        function(error) {
+          if (error) throw error;
+          updateEmpManager(answer.titleID, answer.managerID);
+          viewEmployees();
+        }
+      );
+    });
+  };
 
 viewDept = () => {
     connection.query("SELECT * from department", function(err, res) {
@@ -182,7 +176,7 @@ viewRole = () => {
 
 viewEmployees = () => {
     connection.query(
-        "SELECT employee.employee_id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.role_id LEFT JOIN department on role.department_id = department.department_id LEFT JOIN employee manager on manager.manager_id = employee.manager_id;",
+        "SELECT * from employee",
         function(err, res) {
             if (err) throw err;
             console.table(res);
